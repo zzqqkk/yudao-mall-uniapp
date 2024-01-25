@@ -1,41 +1,49 @@
-import request2 from '@/sheep/request2';
+import request from '@/sheep/request';
 
 const AddressApi = {
   // 获得用户收件地址列表
   getAddressList: () => {
-    return request2({
-      url: '/app-api/member/address/list',
+    return request({
+      url: '/member/address/list',
       method: 'GET'
     });
   },
   // 创建用户收件地址
   createAddress: (data) => {
-    return request2({
-      url: '/app-api/member/address/create',
+    return request({
+      url: '/member/address/create',
       method: 'POST',
-      data
+      data,
+      custom: {
+        showSuccess: true,
+        successMsg: '保存成功'
+      },
     });
   },
   // 更新用户收件地址
   updateAddress: (data) => {
-    return request2({
-      url: '/app-api/member/address/update',
+    return request({
+      url: '/member/address/update',
       method: 'PUT',
-      data
+      data,
+      custom: {
+        showSuccess: true,
+        successMsg: '更新成功'
+      },
     });
   },
   // 获得用户收件地址
   getAddress: (id) => {
-    return request2({
-      url: '/app-api/member/address/get',
+    return request({
+      url: '/member/address/get',
       method: 'GET',
       params: { id }
     });
   },
   // 删除用户收件地址
   deleteAddress: (id) => {
-    return request2({
-      url: '/app-api/member/address/delete',
+    return request({
+      url: '/member/address/delete',
       method: 'DELETE',
       params: { id }
     });

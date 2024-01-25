@@ -13,6 +13,15 @@ const OrderApi = {
     if (!(data.addressId > 0)) {
       delete data2.addressId;
     }
+    if (!(data.combinationActivityId) > 0) {
+      delete data2.combinationActivityId;
+    }
+    if (!(data.combinationHeadId > 0)) {
+      delete data2.combinationHeadId;
+    }
+    if (!(data.seckillActivityId > 0)) {
+      delete data2.seckillActivityId;
+    }
     // 解决 SpringMVC 接受 List<Item> 参数的问题
     delete data2.items;
     for (let i = 0; i < data.items.length; i++) {
@@ -26,14 +35,18 @@ const OrderApi = {
       .map((key) => key + '=' + data2[key])
       .join('&');
     return request({
-      url: `/app-api/trade/order/settlement?${queryString}`,
+      url: `/trade/order/settlement?${queryString}`,
       method: 'GET',
+      custom: {
+        showError: true,
+        showLoading: true,
+      },
     });
   },
   // 创建订单
   createOrder: (data) => {
     return request({
-      url: `/app-api/trade/order/create`,
+      url: `/trade/order/create`,
       method: 'POST',
       data,
     });
@@ -41,17 +54,20 @@ const OrderApi = {
   // 获得订单
   getOrder: (id) => {
     return request({
-      url: `/app-api/trade/order/get-detail`,
+      url: `/trade/order/get-detail`,
       method: 'GET',
       params: {
         id,
+      },
+      custom: {
+        showLoading: false,
       },
     });
   },
   // 订单列表
   getOrderPage: (params) => {
     return request({
-      url: '/app-api/trade/order/page',
+      url: '/trade/order/page',
       method: 'GET',
       params,
       custom: {
@@ -62,7 +78,7 @@ const OrderApi = {
   // 确认收货
   receiveOrder: (id) => {
     return request({
-      url: `/app-api/trade/order/receive`,
+      url: `/trade/order/receive`,
       method: 'PUT',
       params: {
         id,
@@ -72,7 +88,7 @@ const OrderApi = {
   // 取消订单
   cancelOrder: (id) => {
     return request({
-      url: `/app-api/trade/order/cancel`,
+      url: `/trade/order/cancel`,
       method: 'DELETE',
       params: {
         id,
@@ -82,8 +98,18 @@ const OrderApi = {
   // 删除订单
   deleteOrder: (id) => {
     return request({
-      url: `/app-api/trade/order/delete`,
+      url: `/trade/order/delete`,
       method: 'DELETE',
+      params: {
+        id,
+      },
+    });
+  },
+  // 获得交易订单的物流轨迹
+  getOrderExpressTrackList: (id) => {
+    return request({
+      url: `/trade/order/get-express-track-list`,
+      method: 'GET',
       params: {
         id,
       },
@@ -92,7 +118,7 @@ const OrderApi = {
   // 获得交易订单数量
   getOrderCount: () => {
     return request({
-      url: '/app-api/trade/order/get-count',
+      url: '/trade/order/get-count',
       method: 'GET',
       custom: {
         showLoading: false,
@@ -103,7 +129,7 @@ const OrderApi = {
   // 创建单个评论
   createOrderItemComment: (data) => {
     return request({
-      url: `/app-api/trade/order/item/create-comment`,
+      url: `/trade/order/item/create-comment`,
       method: 'POST',
       data,
     });

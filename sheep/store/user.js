@@ -1,7 +1,7 @@
 import {
 	defineStore
 } from 'pinia';
-import userApi from '@/sheep/api/user';
+// import userApi from '@/sheep/api/user';
 import $share from '@/sheep/platform/share';
 import {
 	isEmpty,
@@ -13,8 +13,6 @@ import app from './app';
 import {
 	showAuthModal
 } from '@/sheep/hooks/useModal';
-import AuthUtil from '@/sheep/api/member/auth';
-import BrokerageApi from '@/sheep/api/trade/brokerage';
 import UserApi from '@/sheep/api/member/user';
 import PayWalletApi from '@/sheep/api/pay/wallet';
 import OrderApi from '@/sheep/api/trade/order';
@@ -101,14 +99,15 @@ const user = defineStore({
 		},
 
 		// 设置 token
-    // TODO 芋艿：后续要支持访问令牌的刷新！！！
-    setToken(token = '') {
+    setToken(token = '', refreshToken = '') {
 			if (token === '') {
 				this.isLogin = false;
 				uni.removeStorageSync('token');
+        uni.removeStorageSync('refresh-token')
 			} else {
 				this.isLogin = true;
 				uni.setStorageSync('token', token);
+        uni.setStorageSync('refresh-token', refreshToken);
 				this.loginAfter();
 			}
 			return this.isLogin;

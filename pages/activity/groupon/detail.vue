@@ -1,10 +1,12 @@
+<!-- 拼团订单的详情 -->
 <template>
   <s-layout title="拼团详情" class="detail-wrap" :navbar="state.data && !state.loading ? 'inner': 'normal'" :onShareAppMessage="shareInfo">
     <view v-if="state.loading"></view>
     <view v-if="state.data && !state.loading">
+      <!-- 团长信息 + 活动信息 -->
       <view
         class="recharge-box"
-        v-if="state.data.goods"
+        v-if="state.data.headRecord"
         :style="[
           {
             marginTop: '-' + Number(statusBarHeight + 88) + 'rpx',
@@ -14,59 +16,62 @@
       >
         <s-goods-item
           class="goods-box"
-          :img="state.data.goods.image"
-          :title="state.data.goods.title"
-          :price="state.data.goods.price[0]"
+          :img="state.data.headRecord.picUrl"
+          :title="state.data.headRecord.spuName"
+          :price="state.data.headRecord.combinationPrice"
           priceColor="#E1212B"
           @tap="
             sheep.$router.go('/pages/goods/groupon', {
-              id: state.data.goods.id,
-              activity_id: state.data.goods.activity.id,
+              id: state.data.headRecord.activityId
             })
           "
           :style="[{ top: Number(statusBarHeight + 108) + 'rpx' }]"
         >
           <template #groupon>
             <view class="ss-flex">
-              <view class="sales-title">{{ state.data.num }}人团</view>
-              <view class="num-title ss-m-l-20">已拼{{ state.data.goods.sales }}件</view>
+              <view class="sales-title">{{ state.data.headRecord.userSize }}人团</view>
+              <view class="num-title ss-m-l-20">已拼{{ state.data.headRecord.userCount }}件</view>
             </view>
           </template>
         </s-goods-item>
       </view>
+
       <view class="countdown-box detail-card ss-p-t-44 ss-flex-col ss-col-center">
-        <view v-if="state.data.status === 'finish' || state.data.status === 'finish_fictitious'">
-          <view v-if="state.data.my">
+        <!-- 情况一：拼团成功 -->
+        <view v-if="state.data.headRecord.status === 1">
+          <view v-if="state.data.orderId">
             <view class="countdown-title ss-flex">
-              <text class="cicon-check-round"></text>
+              <text class="cicon-check-round" />
               恭喜您~拼团成功
             </view>
           </view>
           <view v-else>
             <view class="countdown-title ss-flex">
-              <text class="cicon-info"></text>
+              <text class="cicon-info" />
               抱歉~该团已满员
             </view>
           </view>
         </view>
-        <view v-if="state.data.status === 'invalid'">
+
+        <!-- 情况二：拼团失败 -->
+        <view v-if="state.data.headRecord.status === 2">
           <view class="countdown-title ss-flex">
             <text class="cicon-info"></text>
-            {{ state.data.my ? '拼团超时,已自动退款' : '该团已解散' }}
+            {{ state.data.orderId ? '拼团超时,已自动退款' : '该团已解散' }}
           </view>
         </view>
-        <view v-if="state.data.status === 'ing'">
-          <!-- TODO: 拼团进行中+活动结束-->
-          <view v-if="state.data.activity_status === 'ended'">
+
+        <!-- 情况三：拼团进行中 -->
+        <view v-if="state.data.headRecord.status === 0">
+          <view v-if="state.data.headRecord.expireTime <= new Date().getTime()">
             <view class="countdown-title ss-flex">
               <text class="cicon-info"></text>
               拼团已结束,请关注下次活动
             </view>
           </view>
-
-          <view class="countdown-title ss-flex" v-if="state.data.activity_status === 'ing'">
+          <view class="countdown-title ss-flex" v-else>
             还差
-            <view class="num">{{ state.data.num - state.data.current_num }}人</view>
+            <view class="num">{{ state.data.headRecord.userSize - state.data.headRecord.userCount }}人</view>
             拼团成功
             <view class="ss-flex countdown-time">
               <view class="countdown-h ss-flex ss-row-center">{{ endTime.h }}</view>
@@ -82,10 +87,17 @@
           </view>
         </view>
 
+        <!-- 拼团的记录列表，展示每个参团人 -->
         <view class="ss-m-t-60 ss-flex ss-flex-wrap ss-row-center">
+          <!-- 团长 -->
+          <view class="header-avatar ss-m-r-24 ss-m-b-20">
+            <image :src="sheep.$url.cdn(state.data.headRecord.avatar)" class="avatar-img"></image>
+            <view class="header-tag ss-flex ss-col-center ss-row-center">团长</view>
+          </view>
+          <!-- 团员 -->
           <view
             class="header-avatar ss-m-r-24 ss-m-b-20"
-            v-for="item in state.data.groupon_logs"
+            v-for="item in state.data.memberRecords"
             :key="item.id"
           >
             <image :src="sheep.$url.cdn(item.avatar)" class="avatar-img"></image>
@@ -96,57 +108,38 @@
               团长
             </view>
           </view>
-          <view class="default-avatar ss-m-r-24 ss-m-b-20" v-for="item in state.number" :key="item">
+          <!-- 还有几个坑位 -->
+          <view class="default-avatar ss-m-r-24 ss-m-b-20" v-for="item in state.remainNumber" :key="item">
             <image
               :src="sheep.$url.static('/static/img/shop/avatar/unknown.png')"
               class="avatar-img"
             ></image>
           </view>
         </view>
-        <view
-          class="detail-cell-wrap ss-flex ss-col-center ss-row-between"
-          v-if="state.data.activity?.richtext_id > 0"
-          @tap="
-            sheep.$router.go('/pages/public/richtext', {
-              id: state.data.activity.richtext_id,
-              title: state.data.activity.richtext_title,
-            })
-          "
-        >
-          <view class="label-text">玩法</view>
-          <view class="ss-flex">
-            <view class="cell-content ss-line-1 ss-flex-1">
-              {{ state.data.activity?.richtext_title }}
-            </view>
-            <button class="ss-reset-button">
-              <text class="_icon-forward right-forwrad-icon"></text>
-            </button>
-          </view>
-        </view>
       </view>
+
+      <!-- 情况一：拼团成功；情况二：拼团失败 -->
       <view
-        v-if="
-          state.data.status == 'finish' ||
-          state.data.status == 'finish_fictitious' ||
-          state.data.status == 'invalid'
-        "
+        v-if="state.data.headRecord.status === 1 || state.data.headRecord.status === 2"
         class="ss-m-t-40 ss-flex ss-row-center"
       >
         <button
           class="ss-reset-button order-btn"
-          v-if="state.data.my"
-          @tap="onDetail(state.data.my.order_id)"
+          v-if="state.data.orderId"
+          @tap="onDetail(state.data.orderId)"
         >
           查看订单
         </button>
         <button class="ss-reset-button join-btn" v-else @tap="onCreateGroupon"> 我要开团 </button>
       </view>
-      <view v-if="state.data.status === 'ing'" class="ss-m-t-40 ss-flex ss-row-center">
-        <view v-if="state.data.activity_status === 'ended'">
+
+      <!-- 情况三：拼团进行中，查看订单或参加或邀请好友或参加 -->
+      <view v-if="state.data.headRecord.status === 0" class="ss-m-t-40 ss-flex ss-row-center">
+        <view v-if="state.data.headRecord.expireTime <= new Date().getTime()">
           <button
             class="ss-reset-button join-btn"
-            v-if="state.data.my"
-            @tap="onDetail(state.data.my.order_id)"
+            v-if="state.data.orderId"
+            @tap="onDetail(state.data.orderId)"
           >
             查看订单
           </button>
@@ -154,16 +147,16 @@
             class="ss-reset-button disabled-btn"
             v-else
             disabled
-            @tap="onDetail(state.data.my.order_id)"
+            @tap="onDetail(state.data.orderId)"
           >
             去参团
           </button>
         </view>
         <view v-else class="ss-flex ss-row-center">
-          <view v-if="state.data.my">
+          <view v-if="state.data.orderId">
             <button
               class="ss-reset-button join-btn"
-              :disabled="state.data.activity_status === 'ing' && endTime.ms <= 0"
+              :disabled="endTime.ms <= 0"
               @tap="onShare"
             >
               邀请好友来拼团
@@ -172,7 +165,7 @@
           <view v-else>
             <button
               class="ss-reset-button join-btn"
-              :disabled="state.data.activity_status === 'ing' && endTime.ms <= 0"
+              :disabled="endTime.ms <= 0"
               @tap="onJoinGroupon()"
             >
               立即参团
@@ -181,6 +174,7 @@
         </view>
       </view>
 
+      <!-- TODO 芋艿：这里暂时没接入 -->
       <view v-if="state.data.goods">
         <s-select-groupon-sku
           :show="state.showSelectSku"
@@ -193,7 +187,8 @@
         />
       </view>
     </view>
-    <s-empty v-if="!state.data && !state.loading" icon="/static/goods-empty.png"> </s-empty>
+
+    <s-empty v-if="!state.data && !state.loading" icon="/static/goods-empty.png" />
   </s-layout>
 </template>
 
@@ -204,25 +199,29 @@
   import { useDurationTime } from '@/sheep/hooks/useGoods';
   import { showShareModal } from '@/sheep/hooks/useModal';
   import { isEmpty } from 'lodash';
+  import CombinationApi from "@/sheep/api/promotion/combination";
 
   const headerBg = sheep.$url.css('/static/img/shop/user/withdraw_bg.png');
   const statusBarHeight = sheep.$platform.device.statusBarHeight * 2;
   const state = reactive({
-    data: {},
+    data: {}, // 拼团详情
     loading: true,
     grouponAction: 'create',
     showSelectSku: false,
     grouponNum: 0,
     number: 0,
+    activity: {},
+    combinationHeadId: null, // 拼团团长编号
   });
 
+  // todo 芋艿：分享要再接下
   const shareInfo = computed(() => {
     if (isEmpty(state.data)) return {};
     return sheep.$platform.share.getShareInfo(
       {
-        title: state.data.goods.title,
-        image: sheep.$url.cdn(state.data.goods.image),
-        desc: state.data.goods.subtitle,
+        title: state.data.headRecord.spuName,
+        image: sheep.$url.cdn(state.data.headRecord.picUrl),
+        desc: state.data.goods?.subtitle,
         params: {
           page: '5',
           query: state.data.id,
@@ -230,10 +229,10 @@
       },
       {
         type: 'groupon', // 邀请拼团海报
-        title: state.data.goods.title, // 商品标题
-        image: sheep.$url.cdn(state.data.goods.image), // 商品主图
-        price: state.data.goods.price[0], // 商品价格
-        original_price: state.data.goods.original_price, // 商品原价
+        title: state.data.headRecord.spuName, // 商品标题
+        image: sheep.$url.cdn(state.data.headRecord.picUrl), // 商品主图
+        price: state.data.goods?.price, // 商品价格
+        original_price: state.data.goods?.original_price, // 商品原价
       },
     );
   });
@@ -245,40 +244,38 @@
     });
   }
 
-  //去开团
+  // 去开团 TODO 芋艿：这里没接入
   function onCreateGroupon() {
     state.grouponAction = 'create';
     state.grouponId = 0;
     state.showSelectSku = true;
   }
 
-  // 规格变更
+  // 规格变更 TODO 芋艿：这里没接入
   function onSkuChange(e) {
     state.selectedSkuPrice = e;
   }
 
-  // 立即参团
+  // 立即参团 TODO 芋艿：这里没接入
   function onJoinGroupon() {
     state.grouponAction = 'join';
-    state.grouponId = state.data.id;
+    state.grouponId = state.data.activityId;
+    state.combinationHeadId = state.data.id;
     state.grouponNum = state.data.num;
     state.showSelectSku = true;
   }
 
-  // 立即购买
-  function onBuy(e) {
+  // 立即购买 TODO 芋艿：这里没接入
+  function onBuy(sku) {
     sheep.$router.go('/pages/order/confirm', {
       data: JSON.stringify({
         order_type: 'goods',
-        buy_type: 'groupon',
-        activity_id: state.data.activity.id,
-        groupon_id: state.grouponId,
-        groupon_num: state.grouponNum,
-        goods_list: [
+        combinationActivityId: state.data.activity.id,
+        combinationHeadId: state.combinationHeadId,
+        items: [
           {
-            goods_id: e.goods_id,
-            goods_num: e.goods_num,
-            goods_sku_price_id: e.id,
+            skuId: sku.id,
+            count: sku.count,
           },
         ],
       }),
@@ -286,16 +283,20 @@
   }
 
   const endTime = computed(() => {
-    return useDurationTime(state.data.expire_time);
+    return useDurationTime(state.data.headRecord.expireTime);
   });
 
   // 获取拼团团队详情
   async function getGrouponDetail(id) {
-    const { error, data } = await sheep.$api.activity.grouponDetail(id);
-    if (error === 0) {
+    const { code, data } = await CombinationApi.getCombinationRecordDetail(id);
+    if (code === 0) {
       state.data = data;
-      let number = Number(state.data.num - state.data.current_num);
-      state.number = number > 0 ? number : 0;
+      const remainNumber = Number(state.data.headRecord.userSize - state.data.headRecord.userCount);
+      state.remainNumber = remainNumber > 0 ? remainNumber : 0;
+
+      // 获取活动信息
+      const { data: activity } = await CombinationApi.getCombinationActivity(data.headRecord.activityId);
+      state.activity = activity;
     } else {
       state.data = null;
     }

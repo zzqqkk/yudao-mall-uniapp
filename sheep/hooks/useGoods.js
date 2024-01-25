@@ -74,12 +74,12 @@ const VIDEO_SUFFIX_LIST = ['.avi', '.mp4']
  * @return {{src: string, type: 'video' | 'image' }[]}  转换后的链接列表
  */
 export function formatGoodsSwiper(urlList) {
-  return urlList.filter(url => url).map((url, key) => {
+  return urlList?.filter(url => url).map((url, key) => {
     const isVideo = VIDEO_SUFFIX_LIST.some(suffix => url.includes(suffix));
     const type = isVideo ? 'video' : 'image'
     const src = $url.cdn(url);
     return { type, src }
-  });
+  }) || [];
 }
 
 /**
@@ -367,4 +367,21 @@ export function convertProductPropertyList(skus) {
     }
   }
   return result;
+}
+
+/**
+ * 格式化满减送活动的规则
+ *
+ * @param activity 活动信息
+ * @param rule 优惠规格
+ * @returns {string} 规格字符串
+ */
+export function formatRewardActivityRule(activity, rule) {
+  if (activity.conditionType === 10) {
+    return `满 ${fen2yuan(rule.limit)} 元减 ${fen2yuan(rule.discountPrice)} 元`;
+  }
+  if (activity.conditionType === 20) {
+    return `满 ${rule.limit} 件减 ${fen2yuan(rule.discountPrice)} 元`;
+  }
+  return '';
 }

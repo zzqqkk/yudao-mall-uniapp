@@ -208,6 +208,9 @@
       addressId: state.addressInfo.id,
       deliveryType: 1, // TODO 芋艿：需要支持【门店自提】
       pointStatus: false, // TODO 芋艿：需要支持【积分选择】
+      combinationActivityId: state.orderPayload.combinationActivityId,
+      combinationHeadId: state.orderPayload.combinationHeadId,
+      seckillActivityId: state.orderPayload.seckillActivityId
     });
     if (code !== 0) {
       return;
@@ -231,6 +234,9 @@
       addressId: state.addressInfo.id,
       deliveryType: 1, // TODO 芋艿：需要支持【门店自提】
       pointStatus: false, // TODO 芋艿：需要支持【积分选择】
+      combinationActivityId: state.orderPayload.combinationActivityId,
+      combinationHeadId: state.orderPayload.combinationHeadId,
+      seckillActivityId: state.orderPayload.seckillActivityId
     });
     if (code !== 0) {
       return;

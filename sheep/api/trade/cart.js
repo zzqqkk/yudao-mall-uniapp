@@ -1,12 +1,11 @@
-import request2 from '@/sheep/request2';
+import request from '@/sheep/request';
 
 const CartApi = {
   addCart: (data) => {
-    return request2({
-      url: '/app-api/trade/cart/add',
+    return request({
+      url: '/trade/cart/add',
       method: 'POST',
       data: data,
-      // TODO 芋艿：这里没提示
       custom: {
         showSuccess: true,
         successMsg: '已添加到购物车~',
@@ -14,22 +13,22 @@ const CartApi = {
     });
   },
   updateCartCount: (data) => {
-    return request2({
-      url: '/app-api/trade/cart/update-count',
+    return request({
+      url: '/trade/cart/update-count',
       method: 'PUT',
       data: data
     });
   },
   updateCartSelected: (data) => {
-    return request2({
-      url: '/app-api/trade/cart/update-selected',
+    return request({
+      url: '/trade/cart/update-selected',
       method: 'PUT',
       data: data
     });
   },
   deleteCart: (ids) => {
-    return request2({
-      url: '/app-api/trade/cart/delete',
+    return request({
+      url: '/trade/cart/delete',
       method: 'DELETE',
       params: {
         ids
@@ -37,9 +36,13 @@ const CartApi = {
     });
   },
   getCartList: () => {
-    return request2({
-      url: '/app-api/trade/cart/list',
+    return request({
+      url: '/trade/cart/list',
       method: 'GET',
+      custom: {
+        showLoading: false,
+        auth: true,
+      },
     });
   },
 };

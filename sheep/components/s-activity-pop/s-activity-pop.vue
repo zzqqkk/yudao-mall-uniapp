@@ -1,3 +1,4 @@
+<!-- 商品信息：满减送等营销活动的弹窗 -->
 <template>
   <su-popup :show="show" type="bottom" round="20" @close="emits('close')" showClose>
     <view class="model-box">
@@ -9,28 +10,14 @@
         :enable-back-to-top="true"
       >
         <view v-for="item in state.activityInfo" :key="item.id">
-          <!-- <uni-list :border="false">
-            <uni-list-item showArrow clickable @tap="sheep.$router.go('/pages/goods/list')">
-              <template v-slot:header>
-                <view class="model-content-tag ss-flex ss-row-center">{{ item.type_text }}</view>
-              </template>
-              <template v-slot:body>
-                <view class="ss-m-l-20 model-content-title">
-                  <view class="ss-m-b-24" v-for="text in item.texts" :key="text">
-                    {{ text }}
-                  </view>
-                </view>
-              </template>
-            </uni-list-item>
-          </uni-list> -->
           <view class="ss-flex ss-col-top ss-m-b-40" @tap="onGoodsList(item)">
-            <view class="model-content-tag ss-flex ss-row-center">{{ item.type_text }}</view>
+            <view class="model-content-tag ss-flex ss-row-center">满减</view>
             <view class="ss-m-l-20 model-content-title ss-flex-1">
-              <view class="ss-m-b-24" v-for="text in item.texts" :key="text">
-                {{ text }}
+              <view class="ss-m-b-24" v-for="rule in state.activityMap[item.id]?.rules" :key="rule">
+                {{ formatRewardActivityRule(state.activityMap[item.id], rule) }}
               </view>
             </view>
-            <text class="cicon-forward"></text>
+            <text class="cicon-forward" />
           </view>
         </view>
       </scroll-view>
@@ -39,7 +26,10 @@
 </template>
 <script setup>
   import sheep from '@/sheep';
-  import { computed, reactive } from 'vue';
+  import { computed, reactive, watch } from 'vue';
+  import RewardActivityApi from '@/sheep/api/promotion/rewardActivity';
+  import { formatRewardActivityRule } from '@/sheep/hooks/useGoods';
+
   const props = defineProps({
     modelValue: {
       type: Object,
@@ -53,7 +43,26 @@
   const emits = defineEmits(['close']);
   const state = reactive({
     activityInfo: computed(() => props.modelValue),
+    activityMap: {}
   });
+
+  watch(
+    () => props.show,
+    () => {
+      // 展示的情况下，加载每个活动的详细信息
+      if (props.show) {
+        state.activityInfo?.forEach(activity => {
+          RewardActivityApi.getRewardActivity(activity.id).then(res => {
+            if (res.code !== 0) {
+              return;
+            }
+            state.activityMap[activity.id] = res.data;
+          })
+        });
+      }
+    },
+  );
+
   function onGoodsList(e) {
     sheep.$router.go('/pages/activity/index', {
       activityId: e.id,
