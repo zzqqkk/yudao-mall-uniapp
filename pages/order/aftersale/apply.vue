@@ -82,7 +82,8 @@
     <su-fixed bottom placeholder>
       <view class="foot-wrap">
         <view class="foot_box ss-flex ss-col-center ss-row-between ss-p-x-30">
-          <button class="ss-reset-button contcat-btn" @tap="sheep.$router.go('/pages/chat/index')">
+<!--          <button class="ss-reset-button contcat-btn" @tap="sheep.$url.go('/pages/chat/index')">-->
+          <button class="ss-reset-button contcat-btn" @tap="sheep.$url.go('https://work.weixin.qq.com/kfid/kfc6ddf49c311e14a8b')">
             联系客服
           </button>
           <button class="ss-reset-button ui-BG-Main-Gradient sub-btn" @tap="submit">提交</button>

@@ -224,7 +224,7 @@
         desc: state.data.goods?.subtitle,
         params: {
           page: '5',
-          query: state.data.id,
+          query: state.data.headRecord.id,
         },
       },
       {

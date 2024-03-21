@@ -10,3 +10,4 @@ yarn.lock
 package-lock.json
 *.keystore
 pnpm-lock.yaml
+/yudao-mall-uniapp.iml

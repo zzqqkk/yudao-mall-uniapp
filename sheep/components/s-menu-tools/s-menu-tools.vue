@@ -65,7 +65,8 @@
       title: '我的收藏',
     },
     {
-      url: '/pages/chat/index',
+      // url: '/pages/chat/index',
+      url: 'https://work.weixin.qq.com/kfid/kfc6ddf49c311e14a8b',
       icon: '/static/img/shop/tools/service.png',
       title: '客服',
     },

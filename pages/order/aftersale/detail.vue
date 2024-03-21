@@ -97,7 +97,8 @@
                 @tap="sheep.$router.go('/pages/order/aftersale/return-delivery', { id: state.info.id })">
           填写退货
         </button>
-				<button class="ss-reset-button contcat-btn btn" @tap="sheep.$router.go('/pages/chat/index')">
+<!--				<button class="ss-reset-button contcat-btn btn" @tap="sheep.$router.go('/pages/chat/index')">-->
+				<button class="ss-reset-button contcat-btn btn" @tap="sheep.$router.go('https://work.weixin.qq.com/kfid/kfc6ddf49c311e14a8b')">
           联系客服
         </button>
 			</view>

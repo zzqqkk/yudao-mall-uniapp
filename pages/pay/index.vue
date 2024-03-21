@@ -19,7 +19,8 @@
           <label class="pay-type-item" v-for="item in state.payMethods" :key="item.title">
             <view
               class="pay-item ss-flex ss-col-center ss-row-between ss-p-x-30 border-bottom"
-              :class="{ 'disabled-pay-item': item.disabled }"
+              :class="{ 'disabled-pay-item': item.disabled}" 
+			  v-if="showItem(item)"
             >
               <view class="ss-flex ss-col-center">
                 <image
@@ -93,6 +94,13 @@
     payMethods: [], // 可选的支付方式
     payment: '', // 选中的支付方式
   });
+  
+  const showItem = (item) => {
+	  if (state.orderType === 'recharge' && item.value === 'wallet'){
+		  return false;
+	  }
+	  return !item.disabled;
+  }
 
   const onPay = () => {
     if (state.payment === '') {

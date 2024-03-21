@@ -135,7 +135,8 @@
   }
 
   const onChat = () => {
-    sheep.$router.go('/pages/chat/index', {
+    // sheep.$router.go('/pages/chat/index')', {
+    sheep.$router.go('https://work.weixin.qq.com/kfid/kfc6ddf49c311e14a8b', {
       id: props.modelValue.id,
     });
   };

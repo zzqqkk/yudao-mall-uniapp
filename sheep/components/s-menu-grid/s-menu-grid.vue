@@ -44,8 +44,8 @@
 
 <style lang="scss" scoped>
   .menu-image {
-    width: 24px;
-    height: 24px;
+    width: 40px;
+    height: 40px;
   }
   .grid-item-box {
     flex: 1;

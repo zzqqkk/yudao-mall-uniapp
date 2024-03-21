@@ -21,7 +21,7 @@ const app = defineStore({
     },
     platform: {
       share: {
-        methods: [], // 支持的分享方式
+        methods: [], // 支持的分享方式*
         forwardInfo: {}, // 默认转发信息
         posterInfo: {}, // 海报信息
         linkAddress: '', // 复制链接地址
@@ -73,7 +73,7 @@ const app = defineStore({
         this.platform = {
           share: {
             methods: [ "poster", "link" ],
-            linkAddress: "https://shopro.sheepjs.com/#/",
+            linkAddress: "http://qikole.com/#/",
             posterInfo: {
               "user_bg": "/static/img/shop/config/user-poster-bg.png",
               "goods_bg": "/static/img/shop/config/goods-poster-bg.png",
