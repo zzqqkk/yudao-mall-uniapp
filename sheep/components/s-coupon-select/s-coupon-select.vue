@@ -16,7 +16,12 @@
         :scroll-with-animation="false"
         :enable-back-to-top="true"
       >
-        <view class="subtitle ss-m-l-20">可使用优惠券</view>
+        <view class="empty-list" v-if="state.couponInfo.length === 0">
+          <view class="uni-load-more__text">
+            <span>暂无可用优惠券</span>
+          </view>
+        </view>
+        <view v-else>
         <view v-for="(item, index) in state.couponInfo" :key="index">
           <s-coupon-list :data="item" type="user" :disabled="false">
             <template #default>
@@ -30,6 +35,7 @@
               </label>
             </template>
           </s-coupon-list>
+        </view>
         </view>
         <!-- TODO 芋艿：未来接口需要支持下
         <view class="subtitle ss-m-t-40 ss-m-l-20">不可使用优惠券</view>
@@ -91,6 +97,14 @@
     .uni-checkbox-input {
       background-color: var(--ui-BG-Main);
     }
+  }
+
+  .empty-list{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
   }
 
   .model-box {

@@ -43,11 +43,13 @@
           :src="sheep.$url.static('/static/img/shop/order/order_express.png')"
         >
         </image>
-        <view class="ss-font-30">{{ formatOrderStatus(state.orderInfo) }}</view>
+        <view class="ss-font-30">{{ formatOrderStatus(state.orderInfo) }} 
+		</view>
       </view>
-      <view class="ss-font-26 ss-m-x-20 ss-m-b-70">{{
-        formatOrderStatusDescription(state.orderInfo)
-      }}</view>
+	  <view class="verifyCode ss-font-26 ss-m-x-20 ss-m-b-70" v-if="state.orderInfo.deliveryType === 2">核销码：{{state.orderInfo.pickUpVerifyCode}}</view>
+	  <view v-else class="ss-font-26 ss-m-x-20 ss-m-b-70">{{
+	    formatOrderStatusDescription(state.orderInfo)
+	  }}</view>
     </view>
 
     <!-- 收货地址 -->
@@ -125,6 +127,54 @@
         </view>
       </view>
     </view>
+	
+	<view class="notice-box">
+	  <view class="notice-box__content">
+	    <!-- <view class="notice-item--center">
+	      <view class="ss-flex ss-flex-1">
+	        <text class="title">核销码：</text>
+	        <text class="detail">{{ state.orderInfo.pickUpVerifyCode }}</text>
+	      </view>
+	      <button class="ss-reset-button copy-btn" @tap="onCopy">复制</button>
+	    </view> -->
+		<view class="notice-item">
+		  <text class="title">门店名称：</text>
+		  <text class="detail">
+		    {{ state.pickUpStoreInfo.name }}
+		  </text>
+		</view>
+	    <view class="notice-item">
+	      <text class="title">门店地址：</text>
+	      <text class="detail">
+	        {{ state.pickUpStoreInfo.areaName }},{{ state.pickUpStoreInfo.detailAddress }}<view class="showMap" @tap="showMaoLocation">[查看地图]</view>
+	      </text>
+		  
+	    </view>
+	    <view class="notice-item">
+	      <text class="title">门店电话：</text>
+	      <text class="detail">
+			<view class="">
+				<!-- #ifdef H5 -->
+				<a class="grid-container" @click.stop :href="'tel:' + state.pickUpStoreInfo.phone">
+					<view class="store-phone grid-item">
+						<span class="iconfont cicon-phone-call" />
+					</view>
+					<view class="phone grid-item">{{state.pickUpStoreInfo.phone}}</view>
+				</a>
+				<!-- #endif -->
+				<!-- #ifdef MP -->
+				<view class="grid-container" @click.stop="call(state.pickUpStoreInfo.phone)">
+					<view class="store-phone grid-item">
+						<text class="iconfont cicon-phone-call" />
+					</view>
+					<view class="phone grid-item">{{state.pickUpStoreInfo.phone}}</view>
+				</view>
+				<!-- #endif -->
+			</view>
+	      </text>
+	    </view>
+	  </view>
+	</view>
 
     <!-- 订单信息 -->
     <view class="notice-box">
@@ -163,7 +213,7 @@
           <text class="detail">￥{{ fen2yuan(state.orderInfo.totalPrice) }}</text>
         </view>
       </view>
-      <view class="notice-item ss-flex ss-row-between">
+      <view v-if="state.orderInfo.deliveryType !== 2" class="notice-item ss-flex ss-row-between">
         <text class="title">运费</text>
         <text class="detail">￥{{ fen2yuan(state.orderInfo.deliveryPrice) }}</text>
       </view>
@@ -261,6 +311,7 @@
     handleOrderButtons,
   } from '@/sheep/hooks/useGoods';
   import OrderApi from '@/sheep/api/trade/order';
+  import DeliveryApi from '@/sheep/api/trade/delivery';
 
   const statusBarHeight = sheep.$platform.device.statusBarHeight * 2;
   const headerBg = sheep.$url.css('/static/img/shop/order/order_bg.png');
@@ -375,6 +426,25 @@
       id
     });
   }
+  
+  /**
+   * 打开地图
+   */
+  function showMaoLocation () {
+	  console.log(state.pickUpStoreInfo)
+    if (!state.pickUpStoreInfo.latitude || !state.pickUpStoreInfo.longitude) {
+      return this.$util.Tips({
+        title: '缺少经纬度信息无法查看地图！'
+      });
+    }
+    uni.openLocation({
+      latitude: state.pickUpStoreInfo.latitude,
+      longitude: state.pickUpStoreInfo.longitude,
+      scale: 8,
+      name: state.pickUpStoreInfo.name,
+      address: state.pickUpStoreInfo.areaName + state.pickUpStoreInfo.detailAddress,
+    });
+  }
 
   async function getOrderDetail(id) {
     // 对详情数据进行适配
@@ -389,6 +459,7 @@
     }
     if (res.code === 0) {
       state.orderInfo = res.data;
+	  state.pickUpStoreInfo = await (await DeliveryApi.getPickUpStore(state.orderInfo.pickUpStoreId)).data
       handleOrderButtons(state.orderInfo);
     } else {
       sheep.$router.back();
@@ -630,5 +701,41 @@
       font-weight: 500;
       color: #fff;
     }
+  }
+  .verifyCode {
+	  color: white;
+	  font-size: 40rpx;
+	  font-weight: bold;
+  }
+  
+  a {
+  	text-decoration: none;
+  	color: #000;
+  }
+  
+  .grid-container {
+  	grid-template-columns: auto auto;
+  	display: inline-grid;
+  }
+  
+  .grid-item {
+  	text-align: center;
+  	margin: 5rpx 10rpx 5rpx 0rpx;
+  }
+  
+  .store-phone {
+  	color: #fff;
+  	border-radius: 50%;
+  	display: block;
+  	line-height: 28rpx;
+  	width: 28rpx;
+  	text-align: center;
+  	background-color: #e83323;
+  	padding: 2rpx;
+  }
+  .showMap {
+	  display: inline;
+	  color: red;
+	  font-weight: bold;
   }
 </style>

@@ -7,6 +7,15 @@ const DeliveryApi = {
       url: `/trade/delivery/express/list`,
       method: 'get',
     });
+  },
+  getPickUpStore: (id) => {
+	  return request({
+	    url: `/trade/delivery/pick-up-store/get`,
+	    method: 'get',
+		params: {
+		  id,
+		},
+	  });
   }
 };
 

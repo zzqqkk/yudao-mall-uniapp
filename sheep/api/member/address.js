@@ -1,6 +1,12 @@
 import request from '@/sheep/request';
 
 const AddressApi = {
+	getStoreAddressList: () => {
+	  return request({
+	    url: '/trade/delivery/pick-up-store/list',
+	    method: 'GET'
+	  });
+	},
   // 获得用户收件地址列表
   getAddressList: () => {
     return request({

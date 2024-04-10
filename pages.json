@@ -308,6 +308,18 @@
 					}
 				},
 				{
+					"path": "address/store-list",
+					"style": {
+						"navigationBarTitleText": "门店列表"
+					},
+					"meta": {
+						"auth": true,
+						"sync": true,
+						"title": "地址管理",
+						"group": "用户中心"
+					}
+				},
+				{
 					"path": "wallet/money",
 					"style": {
 						"navigationBarTitleText": "我的余额"
@@ -635,7 +647,7 @@
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "芋道商城",
+		"navigationBarTitleText": "藤茵荟商城",
 		"navigationBarBackgroundColor": "#FFFFFF",
 		"backgroundColor": "#FFFFFF",
 		"navigationStyle": "custom"
